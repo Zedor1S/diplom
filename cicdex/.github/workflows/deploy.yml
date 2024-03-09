@@ -1,0 +1,22 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Виконувати при зміні гілки main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Clone repository on server
+      run: ssh user@server 'git clone https://github.com/username/repository.git /path/to/destination/folder/workflows'
+      
+    - name: Execute script on server
+      run: ssh user@server 'bash -s' < /path/to/destination/folder/workflows/script.sh
