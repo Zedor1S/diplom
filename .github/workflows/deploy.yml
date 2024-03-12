@@ -19,4 +19,4 @@ jobs:
           cd Yurii
           git clone https://github.com/Zedor1S/diplom.git
           cd diplom
-          bash script.sh
+          
