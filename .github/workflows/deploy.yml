@@ -16,8 +16,8 @@ jobs:
         passphrase: ${{ secrets.SERVER_PASSPHRASE }}
       
         script: |
-          mkdir wwwww
-          cd wwwww
-          touch test.php
+          mkdir Yurii 
+          cd Yurii
+          touch Readme.txt
           git clone https://github.com/Zedor1S/diplom.git
-          echo 'Deployment successful to digitsal ocean1'
+          echo 'Deployment successful to digital ocean1'
