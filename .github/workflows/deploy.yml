@@ -12,11 +12,13 @@ jobs:
       with:
         host: ${{secrets.SSH_HOST}}
         key: ${{secrets.SSH_KEY}}
-        username: ${{ secrets.SSH_USERNAME }}
-        passphrase: ${{ secrets.SERVER_PASSPHRASE }}
+        username: ${{secrets.SSH_USERNAME}}
+        passphrase: ${{secrets.SERVER_PASSPHRASE}}
       
         script: |
           cd Yurii
+          rm -rf *
           git clone https://github.com/Zedor1S/diplom.git
           cd diplom
-          
+          bash script.sh 
+          gnome-terminal # Відкриття нової сесії терміналу
