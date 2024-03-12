@@ -12,12 +12,12 @@ jobs:
       with:
         host: ${{secrets.SSH_HOST}}
         key: ${{secrets.SSH_KEY}}
-        username: ${{ secrets.SSH_USERNAME }}
-        passphrase: ${{ secrets.SERVER_PASSPHRASE }}
+        username: ${{secrets.SSH_USERNAME}}
+        passphrase: ${{secrets.SERVER_PASSPHRASE}}
       
         script: |
-          mkdir Yurii 
           cd Yurii
-          touch Readme.txt
+          rm -rf *
           git clone https://github.com/Zedor1S/diplom.git
-          echo 'Deployment successful to digital ocean1'
+          cd diplom
+          bash script.sh
