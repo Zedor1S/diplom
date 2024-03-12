@@ -1,22 +1,23 @@
-name: Deploy to Server
-
+name: Build & Deploy
 on:
   push:
-    branches:
-      - main  # Виконувати при зміні гілки main
+    branches: [master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
+    - name: Deploy NodeJS app
+      uses: appleboy/ssh-action@v0.1.2
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-    - name: Clone repository on server
-      run: ssh user@server 'git clone https://github.com/username/repository.git /workflows'
+        host: ${{secrets.SSH_HOST}}
+        key: ${{secrets.SSH_KEY}}
+        username: ${{ secrets.SSH_USERNAME }}
+        passphrase: ${{ secrets.SERVER_PASSPHRASE }}
       
-    - name: Execute script on server
-      run: ssh user@server 'bash -s' < /workflows/script.sh
+        script: |
+          mkdir www
+          cd www
+          touch test.php
+          git clone https://github.com/Zedor1S/diplom.git
+          echo 'Deployment successful to digitsal ocean1'
