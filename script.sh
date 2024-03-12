@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-python_script="c:/Users/yuram/OneDrive/Рабочий стол/update/test.py"
+python_script="test.py"
 
 # Перевірка чи файл існує
 if [ -f "$python_script" ]; then
