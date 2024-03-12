@@ -16,7 +16,7 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clone repository on server
-      run: ssh user@server 'git clone https://github.com/username/repository.git /path/to/destination/folder/workflows'
+      run: ssh user@server 'git clone https://github.com/username/repository.git /workflows'
       
     - name: Execute script on server
-      run: ssh user@server 'bash -s' < /path/to/destination/folder/workflows/script.sh
+      run: ssh user@server 'bash -s' < /workflows/script.sh
