@@ -19,4 +19,3 @@ jobs:
           cd Yurii
           rm -rf *
           git clone https://github.com/Zedor1S/diplom.git
-        
