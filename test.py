@@ -1,13 +1,46 @@
 import cv2
 import sys
 import numpy as np
+import os
 
-def enhance_image(image_path, filter_choices, save_path=None):
+def збільшити_яскравість(image):
+    """
+    Збільшує яскравість зображення.
+    """
+    # Коефіцієнт збільшення яскравості
+    коефіцієнт_яскравості = 1.5
+
+    # Конвертація зображення в формат HSV
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Збільшення значень яскравості
+    hsv_image[:, :, 2] = np.clip(hsv_image[:, :, 2] * коефіцієнт_яскравості, 0, 255)
+
+    # Повернення зображення у формат BGR
+    return cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+def зменшити_яскравість(image):
+    """
+    Зменшує яскравість зображення.
+    """
+    # Коефіцієнт зменшення яскравості
+    коефіцієнт_яскравості = 0.5
+
+    # Конвертація зображення в формат HSV
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Зменшення значень яскравості
+    hsv_image[:, :, 2] = np.clip(hsv_image[:, :, 2] * коефіцієнт_яскравості, 0, 255)
+
+    # Повернення зображення у формат BGR
+    return cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+def обробити_зображення(image_path, вибрані_фільтри, save_path=None):
     """
     Обробляє зображення за вибором користувача і зберігає його.
 
     :param image_path: Шлях до вхідного зображення.
-    :param filter_choices: Список вибраних фільтрів для застосування.
+    :param вибрані_фільтри: Список вибраних фільтрів для застосування.
     :param save_path: Шлях для збереження обробленого зображення.
     """
     # Завантаження зображення
@@ -18,37 +51,54 @@ def enhance_image(image_path, filter_choices, save_path=None):
         print("Не вдалося завантажити зображення.")
         return
 
+    # Перетворення фільтрів з числових значень на повні назви
+    for i in range(len(вибрані_фільтри)):
+        if вибрані_фільтри[i].isdigit():
+            вибрані_фільтри[i] = показати_доступні_фільтри()[int(вибрані_фільтри[i]) - 1]
+
     # Ітеруємося по кожному вибраному фільтру та застосовуємо його
-    for filter_choice in filter_choices:
-        if filter_choice == 'blur':
-            # Застосування фільтру розмиття (blur)
-            image = cv2.blur(image, (10, 10))  # Застосовуємо розмиття з ядром 10x10
-        elif filter_choice == 'enhance_saturation':
+    for вибраний_фільтр in вибрані_фільтри:
+        if вибраний_фільтр == 'розмиття':
+            # Застосування фільтру розмиття
+            image = cv2.blur(image, (10, 10))  
+        elif вибраний_фільтр == 'підвищення насиченості':
             # Збільшення насиченості кольорів
             hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-            hsv_image[:, :, 1] = hsv_image[:, :, 1] * 1.5  # Збільшення насиченості на 50%
+            hsv_image[:, :, 1] = hsv_image[:, :, 1] * 1.5  
             image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
-        elif filter_choice == 'edge_detection':
+        elif вибраний_фільтр == 'виявлення країв':
             # Виявлення країв
-            image = cv2.Canny(image, 100, 200)  # Застосовуємо алгоритм виявлення країв Canny
-        elif filter_choice == 'grayscale':
+            image = cv2.Canny(image, 100, 200)  
+        elif вибраний_фільтр == 'відтінки сірого':
             # Перетворення зображення в чорно-біле
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        elif filter_choice == 'negative':
+        elif вибраний_фільтр == 'негатив':
             # Негатив зображення
             image = 255 - image
-        elif filter_choice == 'rotate':
-            # Поворот зображення
-            angle = int(input("Введіть кут повороту (у градусах): "))
-            image, new_dimensions = rotate_image(image, angle)
-            # Зміна розміру рамки зображення
-            x, y, w, h = new_dimensions
-            image = image[y:y+h, x:x+w]
+        elif вибраний_фільтр == 'збільшення яскравості':
+            # Збільшення яскравості
+            image = збільшити_яскравість(image)
+        elif вибраний_фільтр == 'зменшення яскравості':
+            # Зменшення яскравості
+            image = зменшити_яскравість(image)
+        elif вибраний_фільтр == 'агат':
+            # Фільтр "Агат"
+            image = cv2.applyColorMap(image, cv2.COLORMAP_HOT)
+        elif вибраний_фільтр == 'темно-синій':
+            # Фільтр "Темно-синій"
+            image = cv2.applyColorMap(image, cv2.COLORMAP_WINTER)
+        elif вибраний_фільтр == 'рожевий':
+            # Фільтр "Рожевий"
+            image = cv2.applyColorMap(image, cv2.COLORMAP_PINK)
         else:
-            print(f"Невідомий фільтр: {filter_choice}. Пропускаємо.")
+            print(f"Невідомий фільтр: {вибраний_фільтр}. Пропускаємо.")
 
     # Збереження обробленого зображення, якщо вказано шлях для збереження
     if save_path:
+        # Визначення чи файл існує
+        if os.path.exists(save_path):
+            # Видалення існуючого файлу
+            os.remove(save_path)
         cv2.imwrite(save_path, image)
         print(f"Оброблене зображення збережено за шляхом: {save_path}")
     else:
@@ -56,64 +106,41 @@ def enhance_image(image_path, filter_choices, save_path=None):
         cv2.imwrite(image_path, image)
         print(f"Оброблене зображення замінило оригінал: {image_path}")
 
-
-def rotate_image(image, angle):
-    """
-    Повертає зображення на заданий кут.
-
-    :param image: Зображення для обертання.
-    :param angle: Кут обертання в градусах. Положення за годинниковою стрілкою.
-    :return: Обернуте зображення та нові координати рамки.
-    """
-    height, width = image.shape[:2]
-    rotation_matrix = cv2.getRotationMatrix2D((width / 2, height / 2), angle, 1)
-    rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
-
-    # Обчислення нових координат рамки
-    corners = np.array([[0, 0], [width, 0], [0, height], [width, height]])
-    rotated_corners = cv2.transform(np.array([corners]), rotation_matrix)[0]
-    min_x = int(np.min(rotated_corners[:, 0]))
-    max_x = int(np.max(rotated_corners[:, 0]))
-    min_y = int(np.min(rotated_corners[:, 1]))
-    max_y = int(np.max(rotated_corners[:, 1]))
-    new_width = max_x - min_x
-    new_height = max_y - min_y
-
-    # Повернення обернутого зображення та нових координат рамки
-    return rotated_image, (min_x, min_y, new_width, new_height)
-
-
-def show_available_filters():
+def показати_доступні_фільтри():
     """
     Показує список доступних фільтрів.
     """
+    доступні_фільтри = ["розмиття", "підвищення насиченості", "виявлення країв", "відтінки сірого", "негатив", 
+                        "збільшення яскравості", "зменшення яскравості", "агат", "темно-синій", "рожевий"]
     print("Доступні фільтри:")
-    print("1. blur")
-    print("2. enhance_saturation")
-    print("3. edge_detection")
-    print("4. grayscale")
-    print("5. negative")
-    print("6. rotate")
-
+    for i, фільтр in enumerate(доступні_фільтри, start=1):
+        print(f"{i}. {фільтр}")
+    return доступні_фільтри
 
 if __name__ == "__main__":
     # Отримання шляху до фотографії від користувача
-    image_path = input("Введіть шлях до фото: ")
+    шлях_до_зображення = input("Введіть шлях до фото: ")
 
     # Перевірка наявності шляху до фотографії
-    if not image_path:
-        print("Enter the path to the photo")
+    if not шлях_до_зображення:
+        print("Введіть шлях до фото")
         sys.exit(1)
 
     # Показати список доступних фільтрів
-    show_available_filters()
+    доступні_фільтри = показати_доступні_фільтри()
 
     # Вибір фільтрів
-    filters_input = input("Enter filter numbers separated by commas:")
-    filter_choices = [filter_choice.strip() for filter_choice in filters_input.split(',')]
+    вибрані_фільтри_ввід = input("Введіть номери фільтрів (через кому) або назви фільтрів, розділені комами:")
+    вибрані_фільтри = []
+    for вибраний_фільтр_або_номер in вибрані_фільтри_ввід.split(','):
+        вибраний_фільтр_або_номер = вибраний_фільтр_або_номер.strip()
+        if вибраний_фільтр_або_номер.isdigit():
+            вибрані_фільтри.append(доступні_фільтри[int(вибраний_фільтр_або_номер) - 1])
+        else:
+            вибрані_фільтри.append(вибраний_фільтр_або_номер)
 
     # Опціональний ввід шляху для збереження
-    save_path = input("Enter the path to save the processed image (or leave blank to replace the original): ")
+    шлях_збереження = input("Введіть шлях для збереження обробленого зображення (або залиште порожнім для заміни оригіналу): ")
 
     # Виклик функції обробки зображення
-    enhance_image(image_path, filter_choices, save_path)
+    обробити_зображення(шлях_до_зображення, вибрані_фільтри, шлях_збереження)
